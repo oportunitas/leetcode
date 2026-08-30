@@ -1,0 +1,9 @@
+input:
+122
+output:
+5
+
+input:
+101
+output:
+2
