@@ -10,168 +10,232 @@ using namespace std;
 
 class Solution {
 public:
-	/* idea #1
-		idea #0 works but its very slow. i think the general approach is correct
-		but we just need to remove some unnecessary calculations, since in idea 0's deliberation,
-		we can see that there are unnecessary additions/efforts at populating the total options
-		array. lets try to work on this slowly but backwards and see if we can find patterns
+	/* idea #2 (4ms/92.82th% | 12.22MB/20.02th%)
+		i cant seem to get anywhere with idea #1, i generally stay away for recursion anyway.
+		idea #0 is near-perfect imo, the problem is just how to skip unnecessary iterations. 
 
-			[001, 100, 101, 001, 100]
-		begin:
-			000  001  010  011  100  101
-			     000  000  000  000  000
-		001     
-			000  001  010  011  100  101
-     
-			     000  000  000  000  000
-			     001  000  000  000  000 +
-			     001  000  000  000  000 =
-		100     
-			000  001  010  011  100  101
-     
-			     001  000  000  000  000
-			     000  000  000  001  001 +
-			     001  000  000  001  001
-		101     
-			000  001  010  011  100  101
-     
-			     001  000  000  001  001
-			     000  000  000  000  100 +
-			     001  000  000  001  100
-		001     
-			000  001  010  011  100  101
-			     
-			     001  000  000  001  100
-			     001  000  000  000  101 +
-				 001  000  000  001 1001
-
-		001  000  000  000  000
-		000  000  000  001  001
-		000  000  000  000  100
-		001  000  000  000  101
-
-		hmm, no significant pattern showed up. 
-
-		seems like we need to explore recursion nonetheless. lets find a way to do something similar to #idea 0 but with recursion. we need to have a stop point for recursion, so
-		we need to find the max number first
-
-		[3, 2, 1, 5], max = 6
-		(result_count index, nums index)
-         3
-         3  2
-         3  2  1
-         3  2  1  5 x
-         3  2     5 x
-         3     1
-         3     1  5 x
-         3        5 x
-            2
-            2  1
-            2  1  5 x
-            2     5 x
-               1
-               1  5
-                  5
-        
-        3
-          2
-            1
-              5
-            1 5
-          2 1
-          2   5 x
-          2 1 5 x
-        3 2
-        3   1
-        3     5 x
-        3   1 5 x
-        3 2 1
-        3 2   5 x
-        3 2 1 5 x
-
-        3 2 1 5 x
-        3 2 1 
-        3 2   5 x
-        3 2
-        3   1 5 x
-        3   1 
-        3     5 x
-        3
-          2 1 5 x
-          2 1 
-          2   5 x
-          2
-            1 5
-            1 
-              5
-        huh, weird pattern
-
-        3 2 1 5 x
-        3 2   5 x
-        3 2 1
-        3   1 5 x
-        3     5 x
-        3   1
-        3 2
-          2 1 5 x
-          2   5 x
-          2 1
-            1 5
-              5
-            1
-          2
-        3
-
-        an interesting pattern emerges in the above recursion deliberation, ones
-        that start with 1st num has 4 total cases, one that start with 2nd num has 2 total cases
-        (power of 2 correlation).
-
-        2 3 1 5 x
-        2 3 1 
-        2 3   5 x
-        2 3
-        2   1 5 x
-        2   1 
-        2     5 x
-        2
-          3 1 5 x
-          3 1 
-          3   5 x
-          3
-            1 5
-            1 
-              5
-
-        5 1 2 3 x
-        5 1 2   x
-        5 1   3 x
-        5 1
-        5   2 3 x
-        5   2   x
-        5     3 x
-        5
-          1 2 3 
-          1 2 
-          1   3 
-          1
-            2 3
-            2 
-              3
-
-        nevermind then, this pattern doesnt seem to persist when we change the numbers around.
+		cpp23 doesnt yet have an ordered map with o(1) search time, so lets just use 2 maps, one
+		to store counts and one as a cache during loops
 	*/
 	int countMaxOrSubsets(vector<int>& nums) {
-		auto final_max {[&nums] () {int _ {0}; for (auto num : nums) _ |= num; return _;} ()};
-		vector<int> result_count (1 << 17, 0); result_count[0] = 1;
+		// vector<int> result_count (1 << 17, 0); result_count[0] = 1;
+		// we switch this to an unordered map (hash), this way we dont iterate through
+		// indeces with value 0 over and over again.
 
-		for (int i = 0; i < nums.size(); ++i) {
-			if (((nums[i] & final_max) ^ nums[i]) != 0) continue;
-			for (int j = final_max; j >= 0; --j) {
-				if (((j & final_max) ^ j) != 0) continue;
-				result_count[j | nums[i]] += result_count[j];
-			}
-		} return result_count[final_max];
-	} 
+		unordered_map<int, int> result_count {{0, 1}};
+		unordered_map<int, int> add_cache {{0, 1}};
+		int max_so_far = 0;
+		// print("\n---\n");
+
+		for (auto num : nums) {
+			for (auto& [i, count] : result_count) {
+				add_cache[i | num] += result_count[i];
+			} 
+
+			// for (auto& [i, count] : result_count) {
+			// 	print("[{}, {}]", i, count);	
+			// } 
+			
+			// print("\n");
+			// for (auto& [i, count] : add_cache) {
+			// 	print("[{}, {}]", i, count);	
+			// }
+
+			for (auto& [i, count] : add_cache) {
+				if (i == 0) continue;
+				result_count[i] += add_cache[i];
+				count = 0;
+			} 
+			
+			// print("\n");
+
+			// print("\n---\n");
+			max_so_far |= num;
+		} 
+
+		return result_count[max_so_far];
+		// return -1;
+		/*
+			0 1 2 3 4 5 6 7
+
+			1 0 0 0 0 0 0 0 | 3
+		    1 0 0 1 0 0 0 0 | 2
+			1 0 1 2 0 0 0 0 | 1
+			  1   
+			1 1 1 5 0 0 0 0 | 5 101
+			1 1 1 5 0 1 0 6 
+		*/
+    }
+
+		// 	for (int i = 0; i < nums.size(); ++i) {
+	// 		for (int j = max_so_far; j >= 0; --j) {
+	// 			result_count[j | nums[i]] += result_count[j];
+	// 		} max_so_far |= nums[i];
+	// 	} return result_count[max_so_far];
+    // }
+
+	// /* idea #1 (abandoned)
+	// 	idea #0 works but its very slow. i think the general approach is correct
+	// 	but we just need to remove some unnecessary calculations, since in idea 0's deliberation,
+	// 	we can see that there are unnecessary additions/efforts at populating the total options
+	// 	array. lets try to work on this slowly but backwards and see if we can find patterns
+
+	// 		[001, 100, 101, 001, 100]
+	// 	begin:
+	// 		000  001  010  011  100  101
+	// 		     000  000  000  000  000
+	// 	001     
+	// 		000  001  010  011  100  101
+     
+	// 		     000  000  000  000  000
+	// 		     001  000  000  000  000 +
+	// 		     001  000  000  000  000 =
+	// 	100     
+	// 		000  001  010  011  100  101
+     
+	// 		     001  000  000  000  000
+	// 		     000  000  000  001  001 +
+	// 		     001  000  000  001  001
+	// 	101     
+	// 		000  001  010  011  100  101
+     
+	// 		     001  000  000  001  001
+	// 		     000  000  000  000  100 +
+	// 		     001  000  000  001  100
+	// 	001     
+	// 		000  001  010  011  100  101
+			     
+	// 		     001  000  000  001  100
+	// 		     001  000  000  000  101 +
+	// 			 001  000  000  001 1001
+
+	// 	001  000  000  000  000
+	// 	000  000  000  001  001
+	// 	000  000  000  000  100
+	// 	001  000  000  000  101
+
+	// 	hmm, no significant pattern showed up. 
+
+	// 	seems like we need to explore recursion nonetheless. lets find a way to do something similar to #idea 0 but with recursion. we need to have a stop point for recursion, so
+	// 	we need to find the max number first
+
+	// 	[3, 2, 1, 5], max = 6
+	// 	(result_count index, nums index)
+    //      3
+    //      3  2
+    //      3  2  1
+    //      3  2  1  5 x
+    //      3  2     5 x
+    //      3     1
+    //      3     1  5 x
+    //      3        5 x
+    //         2
+    //         2  1
+    //         2  1  5 x
+    //         2     5 x
+    //            1
+    //            1  5
+    //               5
+        
+    //     3
+    //       2
+    //         1
+    //           5
+    //         1 5
+    //       2 1
+    //       2   5 x
+    //       2 1 5 x
+    //     3 2
+    //     3   1
+    //     3     5 x
+    //     3   1 5 x
+    //     3 2 1
+    //     3 2   5 x
+    //     3 2 1 5 x
+
+    //     3 2 1 5 x
+    //     3 2 1 
+    //     3 2   5 x
+    //     3 2
+    //     3   1 5 x
+    //     3   1 
+    //     3     5 x
+    //     3
+    //       2 1 5 x
+    //       2 1 
+    //       2   5 x
+    //       2
+    //         1 5
+    //         1 
+    //           5
+    //     huh, weird pattern
+
+    //     3 2 1 5 x
+    //     3 2   5 x
+    //     3 2 1
+    //     3   1 5 x
+    //     3     5 x
+    //     3   1
+    //     3 2
+    //       2 1 5 x
+    //       2   5 x
+    //       2 1
+    //         1 5
+    //           5
+    //         1
+    //       2
+    //     3
+
+    //     an interesting pattern emerges in the above recursion deliberation, ones
+    //     that start with 1st num has 4 total cases, one that start with 2nd num has 2 total cases
+    //     (power of 2 correlation).
+
+    //     2 3 1 5 x
+    //     2 3 1 
+    //     2 3   5 x
+    //     2 3
+    //     2   1 5 x
+    //     2   1 
+    //     2     5 x
+    //     2
+    //       3 1 5 x
+    //       3 1 
+    //       3   5 x
+    //       3
+    //         1 5
+    //         1 
+    //           5
+
+    //     5 1 2 3 x
+    //     5 1 2   x
+    //     5 1   3 x
+    //     5 1
+    //     5   2 3 x
+    //     5   2   x
+    //     5     3 x
+    //     5
+    //       1 2 3 
+    //       1 2 
+    //       1   3 
+    //       1
+    //         2 3
+    //         2 
+    //           3
+
+    //     nevermind then, this pattern doesnt seem to persist when we change the numbers around.
+	// */
+	// int countMaxOrSubsets(vector<int>& nums) {
+	// 	auto final_max {[&nums] () {int _ {0}; for (auto num : nums) _ |= num; return _;} ()};
+	// 	vector<int> result_count (1 << 17, 0); result_count[0] = 1;
+
+	// 	for (int i = 0; i < nums.size(); ++i) {
+	// 		if (((nums[i] & final_max) ^ nums[i]) != 0) continue;
+	// 		for (int j = final_max; j >= 0; --j) {
+	// 			if (((j & final_max) ^ j) != 0) continue;
+	// 			result_count[j | nums[i]] += result_count[j];
+	// 		}
+	// 	} return result_count[final_max];
+	// } 
 
 	// /* idea #0 (124ms/11th% | 75.8MB/13th%)
 	// 	lets try to find a dynamic programming approach for this.
