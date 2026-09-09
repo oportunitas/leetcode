@@ -1,0 +1,9 @@
+input:
+"successes"
+output:
+6
+
+input:
+"aeiaeia"
+output:
+3
