@@ -1,0 +1,17 @@
+input:
+"ab"
+["ad","bd","aaab","baa","badab"]
+output:
+2
+
+input:
+"abc"
+["a","b","c","ab","ac","bc","abc"]
+output:
+7
+
+input:
+"cad"
+["cc","acd","b","ba","bac","bad","ac","d"]
+output:
+4
