@@ -1,0 +1,9 @@
+input:
+"abc"
+output:
+148
+
+input:
+"zaza"
+output:
+160
