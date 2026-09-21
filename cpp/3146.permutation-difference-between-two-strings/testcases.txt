@@ -1,0 +1,11 @@
+input:
+"abc"
+"bac"
+output:
+2
+
+input:
+"abcde"
+"edbac"
+output:
+12
