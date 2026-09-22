@@ -1,0 +1,17 @@
+input:
+"Hello how are you Contestant"
+4
+output:
+"Hello how are you"
+
+input:
+"What is the solution to this problem"
+4
+output:
+"What is the solution"
+
+input:
+"chopper is not a tanuki"
+5
+output:
+"chopper is not a tanuki"
