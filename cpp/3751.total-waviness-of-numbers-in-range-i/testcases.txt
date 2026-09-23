@@ -1,0 +1,17 @@
+input:
+120
+130
+output:
+3
+
+input:
+198
+202
+output:
+3
+
+input:
+4848
+4848
+output:
+2
