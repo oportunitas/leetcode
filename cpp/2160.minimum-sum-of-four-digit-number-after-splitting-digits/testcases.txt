@@ -1,0 +1,9 @@
+input:
+2932
+output:
+52
+
+input:
+4009
+output:
+13
