@@ -13,49 +13,31 @@ from leetgo_py import *
 #         self.val = val
 #         self.left = left
 #         self.right = right
-""" idea #0 (31ms/56th% | 23.9MB/97th%)
+""" idea #0 (26ms/82nd% | 23.9MB/97th%)
     we can use the cpp solution, but zen-ified to python's syntax
 """
 class Solution:
     def __init__(self):
         self.node_list = []
         self.is_added = set()
-        self.node_count = 0
 
-    def _build_node_list(self, cur_node):
-        if cur_node.left is not None:
-            self._build_node_list(cur_node.left)
-        self.node_list.append(cur_node)
-        self.node_count += 1
-        if cur_node.right is not None:
-            self._build_node_list(cur_node.right)
+    def build(self, left, right):
+        if left > right:
+            return None
 
-    def _build_final_tree(self, cur_node, begin, middle, end):
-        left = max(((middle - begin) // 2) + begin, begin)
-        right = min(((end - middle) // 2) + (middle + 1), end)
+        middle = (left + right) // 2
+        parent = self.node_list[middle]
+        parent.left = self.build(left, middle - 1)
+        parent.right = self.build(middle + 1, right)
 
-        # print(f"[{begin} {left} {middle} {right} {end}]")
-
-        if left not in self.is_added:
-            cur_node.left = self.node_list[left]
-            self.is_added.add(left)
-            self._build_final_tree(cur_node.left, begin, left, middle - 1)
-        else:
-            cur_node.left = None
-
-        if right not in self.is_added:
-            cur_node.right = self.node_list[right]
-            self.is_added.add(right)
-            self._build_final_tree(cur_node.right, middle + 1, right, end)
-        else:
-            cur_node.right = None
+        return parent
 
     def balanceBST(self, root: TreeNode | None) -> TreeNode | None:
-        self._build_node_list(root)
+        # inorder traversal to find sorted version of tree
+        self.node_list = (f := lambda n: f(n.left) + [n] + f(n.right) if n else []) (root)
+        
         print([node.val for node in self.node_list])
-        res_root = self.node_list[self.node_count // 2]
-        self._build_final_tree(res_root, 0, (self.node_count // 2), (self.node_count - 1))
-        return res_root
+        return self.build(0, len(self.node_list) - 1)
 
 
 
