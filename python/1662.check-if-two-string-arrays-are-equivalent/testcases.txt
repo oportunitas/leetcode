@@ -1,0 +1,17 @@
+input:
+["ab", "c"]
+["a", "bc"]
+output:
+true
+
+input:
+["a", "cb"]
+["ab", "c"]
+output:
+false
+
+input:
+["abc", "d", "defg"]
+["abcddefg"]
+output:
+true
