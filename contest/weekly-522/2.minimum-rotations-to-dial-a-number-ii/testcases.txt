@@ -1,0 +1,17 @@
+input:
+4
+"1502"
+output:
+9
+
+input:
+4
+"2916"
+output:
+12
+
+input:
+4
+"4219"
+output:
+6
