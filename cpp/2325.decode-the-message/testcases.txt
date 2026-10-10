@@ -1,0 +1,11 @@
+input:
+"the quick brown fox jumps over the lazy dog"
+"vkbs bs t suepuv"
+output:
+"this is a secret"
+
+input:
+"eljuxhpwnyrdgtqkviszcfmabo"
+"zwx hnfx lqantp mnoeius ycgk vcnjrdb"
+output:
+"the five boxing wizards jump quickly"
