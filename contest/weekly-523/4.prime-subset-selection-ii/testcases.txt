@@ -1,0 +1,17 @@
+input:
+7
+20
+output:
+[2, 3, 5, 7]
+
+input:
+15
+18
+output:
+[5,13]
+
+input:
+5
+1
+output:
+[]
