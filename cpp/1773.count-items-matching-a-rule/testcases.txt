@@ -1,0 +1,13 @@
+input:
+[["phone","blue","pixel"],["computer","silver","lenovo"],["phone","gold","iphone"]]
+"color"
+"silver"
+output:
+1
+
+input:
+[["phone","blue","pixel"],["computer","silver","phone"],["phone","gold","iphone"]]
+"type"
+"phone"
+output:
+2
