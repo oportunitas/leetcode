@@ -1,0 +1,14 @@
+input:
+"dog"
+output:
+1
+
+input:
+"card"
+output:
+2
+
+input:
+"gf"
+output:
+-1
