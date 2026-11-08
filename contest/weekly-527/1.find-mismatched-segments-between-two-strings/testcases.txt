@@ -1,0 +1,17 @@
+input:
+"earth"
+"empty"
+output:
+[["ar","mp"],["h","y"]]
+
+input:
+"action"
+"nation"
+output:
+[["ac","na"]]
+
+input:
+"hot"
+"hot"
+output:
+[]
