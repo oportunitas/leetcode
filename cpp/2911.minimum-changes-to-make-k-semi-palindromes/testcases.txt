@@ -1,0 +1,5 @@
+input:
+"abcac"
+2
+output:
+1
