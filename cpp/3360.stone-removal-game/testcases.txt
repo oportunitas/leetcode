@@ -1,0 +1,9 @@
+input:
+12
+output:
+true
+
+input:
+1
+output:
+false
